@@ -89,13 +89,11 @@ public class GatewayDeviceAppTest
 	public void testStartAndStopGatewayApp()
 	{
 		this.gda.startApp();
-		
 		try {
-			Thread.sleep(65000L);
+			Thread.sleep(60000L);
 		} catch (InterruptedException e) {
 			// ignore
 		}
-		
 		this.gda.stopApp(0);
 	}
 	
