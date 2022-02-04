@@ -36,7 +36,11 @@ public class SystemMemUtilTask extends BaseSystemUtilTask
 	@Override
 	public float getTelemetryValue()
 	{
-		return 0.0f;
+		//Returns the current memory usage of the heap that is used for object allocation.
+		MemoryUsage memUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+		//Gets percentage of total heap usage
+		double memUtil = ((double) memUsage.getUsed() / (double) memUsage.getMax()) * 100.0d;
+		return (float)memUtil;
 	}
 	
 }

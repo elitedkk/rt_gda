@@ -27,6 +27,7 @@ public class SystemCpuUtilTask extends BaseSystemUtilTask
 	 */
 	public SystemCpuUtilTask()
 	{
+		//Call base class with the constant parameters
 		super(ConfigConst.NOT_SET, ConfigConst.DEFAULT_TYPE_ID);
 	}
 	
@@ -36,7 +37,8 @@ public class SystemCpuUtilTask extends BaseSystemUtilTask
 	@Override
 	public float getTelemetryValue()
 	{
-		return 0.0f;
+		// Returns the system load average for the last minute
+		return (float)ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
 	}
 	
 }

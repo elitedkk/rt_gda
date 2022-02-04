@@ -92,6 +92,7 @@ public class GatewayDeviceAppTest
 		try {
 			Thread.sleep(60000L);
 		} catch (InterruptedException e) {
+			System.out.println("Exception");
 			// ignore
 		}
 		this.gda.stopApp(0);

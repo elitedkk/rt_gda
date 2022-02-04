@@ -40,7 +40,7 @@ public abstract class BaseSystemUtilTask
 	
 	public String getName()
 	{
-		return null;
+		return this.name;
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public abstract class BaseSystemUtilTask
 	 */
 	public int getTypeID()
 	{
-		return 0;
+		return this.typeID;
 	}
 	
 	/**

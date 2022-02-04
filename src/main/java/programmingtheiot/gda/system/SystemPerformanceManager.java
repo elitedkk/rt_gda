@@ -18,6 +18,10 @@ import programmingtheiot.common.ConfigUtil;
 import programmingtheiot.common.IDataMessageListener;
 import programmingtheiot.common.ResourceNameEnum;
 import programmingtheiot.data.SystemPerformanceData;
+import programmingtheiot.gda.app.GatewayDeviceApp;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Shell representation of class for student implementation.
@@ -26,8 +30,14 @@ import programmingtheiot.data.SystemPerformanceData;
 public class SystemPerformanceManager
 {
 	// private var's
-	
-	
+	private int pollRate = ConfigConst.DEFAULT_POLL_CYCLES;
+	private static final Logger _Logger = Logger.getLogger(GatewayDeviceApp.class.getName());
+	private ScheduledExecutorService schedExecSvc = null;
+	private SystemCpuUtilTask cpuUtilTask = null;
+	private SystemMemUtilTask memUtilTask = null;
+
+	private Runnable taskRunner = null;
+	private boolean isStarted = false;
 	// constructors
 	
 	/**
@@ -36,6 +46,14 @@ public class SystemPerformanceManager
 	 */
 	public SystemPerformanceManager()
 	{
+		this.pollRate = ConfigUtil.getInstance().getInteger(ConfigConst.GATEWAY_DEVICE, ConfigConst.POLL_CYCLES_KEY,ConfigConst.DEFAULT_POLL_CYCLES);
+		this.schedExecSvc = Executors.newScheduledThreadPool(1);
+		this.cpuUtilTask = new SystemCpuUtilTask();
+		this.memUtilTask = new SystemMemUtilTask();
+		//Start a thread that gets CPU and Memory utilization while the application is running
+		this.taskRunner = () -> {
+		    this.handleTelemetry();
+		};
 	}
 	
 	
@@ -43,6 +61,12 @@ public class SystemPerformanceManager
 	
 	public void handleTelemetry()
 	{
+		//Gets CPU and memory utilization
+		
+		float cpuUtilPct = this.cpuUtilTask.getTelemetryValue();
+		float memUtilPct = this.memUtilTask.getTelemetryValue();
+		_Logger.info("CPU Utilization = " + cpuUtilPct);
+		_Logger.info("Memory Utilization = " + memUtilPct);
 	}
 	
 	public void setDataMessageListener(IDataMessageListener listener)
@@ -51,10 +75,23 @@ public class SystemPerformanceManager
 	
 	public void startManager()
 	{
+		if (! this.isStarted) {//Start only if not already started
+			//Schedule a task that will run the runnable at a fixed rate defined by the constants
+		    ScheduledFuture<?> futureTask = this.schedExecSvc.scheduleAtFixedRate(this.taskRunner, 0L, this.pollRate, TimeUnit.SECONDS);
+
+		    this.isStarted = true;
+		    _Logger.log(Level.INFO,"Started the Performance Manager");
+		}
+		else {
+			_Logger.log(Level.INFO,"Already running the Performance Manager");
+		}
 	}
 	
 	public void stopManager()
 	{
+		//Stop the scheduled tasks
+		this.schedExecSvc.shutdown();
+		_Logger.log(Level.INFO,"Stopped the Performance Manager");
 	}
 	
 }

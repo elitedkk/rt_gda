@@ -14,6 +14,8 @@ package programmingtheiot.gda.app;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import programmingtheiot.gda.system.SystemPerformanceManager;
+
 /**
  * Main GDA application.
  * 
@@ -28,7 +30,7 @@ public class GatewayDeviceApp
 	public static final long DEFAULT_TEST_RUNTIME = 60000L;
 	
 	// private var's
-	
+	private SystemPerformanceManager sysPerfManager;
 	
 	// constructors
 	
@@ -40,7 +42,8 @@ public class GatewayDeviceApp
 	public GatewayDeviceApp(String[] args)
 	{
 		super();
-		
+		//Create System Performanc Manager
+		this.sysPerfManager = new SystemPerformanceManager();
 		_Logger.info("Initializing GDA...");
 		
 		parseArgs(args);
@@ -61,7 +64,8 @@ public class GatewayDeviceApp
 		gwApp.startApp();
 		
 		try {
-			Thread.sleep(DEFAULT_TEST_RUNTIME);
+			//Thread.sleep(DEFAULT_TEST_RUNTIME);
+			Thread.sleep(65000L);
 		} catch (InterruptedException e) {
 			// ignore
 		}
@@ -79,10 +83,10 @@ public class GatewayDeviceApp
 	public void startApp()
 	{
 		_Logger.info("Starting GDA...");
-		
 		try {
 			// TODO: Your code here
-			
+			//Start the Performance Manager which schedules tasks repeatedly while the application is active
+			sysPerfManager.startManager();
 			_Logger.info("GDA started successfully.");
 		} catch (Exception e) {
 			_Logger.log(Level.SEVERE, "Failed to start GDA. Exiting.", e);
@@ -99,15 +103,15 @@ public class GatewayDeviceApp
 	public void stopApp(int code)
 	{
 		_Logger.info("Stopping GDA...");
-		
 		try {
 			// TODO: Your code here
-			
+			//Stop scheduling of the Performance manager
+			sysPerfManager.stopManager();
 			_Logger.log(Level.INFO, "GDA stopped successfully with exit code {0}.", code);
 		} catch (Exception e) {
 			_Logger.log(Level.SEVERE, "Failed to cleanly stop GDA. Exiting.", e);
 		}
-		
+		_Logger.log(Level.INFO, "Code = {0}",  code);
 		System.exit(code);
 	}
 	
@@ -142,8 +146,9 @@ public class GatewayDeviceApp
 	 */
 	private void parseArgs(String[] args)
 	{
+		//If arguments were passed when running the application, parse them
 		String configFile = null;
-		
+		_Logger.log(Level.INFO, "Parse Arguments was called");
 		if (args != null) {
 			_Logger.log(Level.INFO, "Parsing {0} command line args.", args.length);
 			
