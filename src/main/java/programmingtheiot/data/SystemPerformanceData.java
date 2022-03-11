@@ -22,13 +22,16 @@ public class SystemPerformanceData extends BaseIotData implements Serializable
 	
 	
 	// private var's
-	
+	private float cpuUtil  = ConfigConst.DEFAULT_VAL;
+	private float diskUtil = ConfigConst.DEFAULT_VAL;
+	private float memUtil  = ConfigConst.DEFAULT_VAL;
     
 	// constructors
 	
 	public SystemPerformanceData()
 	{
 		super();
+		super.setName(ConfigConst.SYS_PERF_DATA);
 	}
 	
 	
@@ -36,29 +39,35 @@ public class SystemPerformanceData extends BaseIotData implements Serializable
 	
 	public float getCpuUtilization()
 	{
-		return 0.0f;
+		return this.cpuUtil;
 	}
 	
 	public float getDiskUtilization()
 	{
-		return 0.0f;
+		return this.diskUtil;
 	}
 	
 	public float getMemoryUtilization()
 	{
-		return 0.0f;
+		return this.memUtil;
 	}
 	
 	public void setCpuUtilization(float val)
 	{
+		this.cpuUtil=val;
+		this.updateTimeStamp();
 	}
 	
 	public void setDiskUtilization(float val)
 	{
+		this.diskUtil=val;
+		this.updateTimeStamp();
 	}
 	
 	public void setMemoryUtilization(float val)
 	{
+		this.memUtil=val;
+		this.updateTimeStamp();
 	}
 	
 	/**
@@ -85,8 +94,19 @@ public class SystemPerformanceData extends BaseIotData implements Serializable
 	/* (non-Javadoc)
 	 * @see programmingtheiot.data.BaseIotData#handleUpdateData(programmingtheiot.data.BaseIotData)
 	 */
+	/**
+    * Update the parameters of SystemPerformanceData Data based on the passed Base data
+    *
+    * @param  data   the data which is to be converted to and set the parameters of inherited class
+    */
 	protected void handleUpdateData(BaseIotData data)
 	{
+		if(data instanceof SystemPerformanceData) {
+			SystemPerformanceData spData = (SystemPerformanceData) data;
+			this.setCpuUtilization(spData.getCpuUtilization());
+			this.setMemoryUtilization(spData.getMemoryUtilization());
+			this.setDiskUtilization(spData.getDiskUtilization());
+		}
 	}
 	
 }

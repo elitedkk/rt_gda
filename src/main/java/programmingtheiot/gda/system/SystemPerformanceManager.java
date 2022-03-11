@@ -35,7 +35,9 @@ public class SystemPerformanceManager
 	private ScheduledExecutorService schedExecSvc = null;
 	private SystemCpuUtilTask cpuUtilTask = null;
 	private SystemMemUtilTask memUtilTask = null;
-
+	private String locationID = ConfigConst.NOT_SET;
+	private IDataMessageListener dataMsgListener = null;
+	
 	private Runnable taskRunner = null;
 	private boolean isStarted = false;
 	// constructors
@@ -47,6 +49,9 @@ public class SystemPerformanceManager
 	public SystemPerformanceManager()
 	{
 		this.pollRate = ConfigUtil.getInstance().getInteger(ConfigConst.GATEWAY_DEVICE, ConfigConst.POLL_CYCLES_KEY,ConfigConst.DEFAULT_POLL_CYCLES);
+		this.locationID =
+				ConfigUtil.getInstance().getProperty(
+					ConfigConst.GATEWAY_DEVICE, ConfigConst.LOCATION_ID_PROP, ConfigConst.NOT_SET);
 		this.schedExecSvc = Executors.newScheduledThreadPool(1);
 		this.cpuUtilTask = new SystemCpuUtilTask();
 		this.memUtilTask = new SystemMemUtilTask();
@@ -58,7 +63,10 @@ public class SystemPerformanceManager
 	
 	
 	// public methods
-	
+	/**
+    * Get CPU and memory utilization and set it into this class so that requesting class can access it
+    * 
+    */
 	public void handleTelemetry()
 	{
 		//Gets CPU and memory utilization
@@ -67,10 +75,22 @@ public class SystemPerformanceManager
 		float memUtilPct = this.memUtilTask.getTelemetryValue();
 		_Logger.info("CPU Utilization = " + cpuUtilPct);
 		_Logger.info("Memory Utilization = " + memUtilPct);
+		SystemPerformanceData spd = new SystemPerformanceData();
+		spd.setLocationID(this.locationID);
+		spd.setCpuUtilization(cpuUtilPct);
+		spd.setMemoryUtilization(memUtilPct);
+
+		if (this.dataMsgListener != null) {
+			this.dataMsgListener.handleSystemPerformanceMessage(
+				ResourceNameEnum.GDA_SYSTEM_PERF_MSG_RESOURCE, spd);
+		}
 	}
 	
 	public void setDataMessageListener(IDataMessageListener listener)
 	{
+		if (listener != null) {
+			this.dataMsgListener = listener;
+		}
 	}
 	
 	public void startManager()

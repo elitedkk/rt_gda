@@ -30,7 +30,8 @@ public class GatewayDeviceApp
 	public static final long DEFAULT_TEST_RUNTIME = 60000L;
 	
 	// private var's
-	private SystemPerformanceManager sysPerfManager;
+	//private SystemPerformanceManager sysPerfManager;
+	private DeviceDataManager devDataMgr;
 	
 	// constructors
 	
@@ -42,8 +43,9 @@ public class GatewayDeviceApp
 	public GatewayDeviceApp(String[] args)
 	{
 		super();
-		//Create System Performanc Manager
-		this.sysPerfManager = new SystemPerformanceManager();
+		//Create System Performance Manager
+		//this.sysPerfManager = new SystemPerformanceManager();
+		this.devDataMgr = new DeviceDataManager();
 		_Logger.info("Initializing GDA...");
 		
 		parseArgs(args);
@@ -86,7 +88,9 @@ public class GatewayDeviceApp
 		try {
 			// TODO: Your code here
 			//Start the Performance Manager which schedules tasks repeatedly while the application is active
-			sysPerfManager.startManager();
+			this.devDataMgr.startManager();
+			//sysPerfManager.startManager();
+			
 			_Logger.info("GDA started successfully.");
 		} catch (Exception e) {
 			_Logger.log(Level.SEVERE, "Failed to start GDA. Exiting.", e);
@@ -106,7 +110,8 @@ public class GatewayDeviceApp
 		try {
 			// TODO: Your code here
 			//Stop scheduling of the Performance manager
-			sysPerfManager.stopManager();
+			this.devDataMgr.stopManager();
+			//sysPerfManager.stopManager();
 			_Logger.log(Level.INFO, "GDA stopped successfully with exit code {0}.", code);
 		} catch (Exception e) {
 			_Logger.log(Level.SEVERE, "Failed to cleanly stop GDA. Exiting.", e);
