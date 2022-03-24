@@ -193,6 +193,23 @@ public class DeviceDataManager implements IDataMessageListener
 			
 			this.sysPerfMgr.startManager();
 		}
+		if (this.mqttClient != null) {
+			if (this.mqttClient.connectClient()) {
+				_Logger.info("Successfully connected MQTT client to broker.");
+				
+				int qos = ConfigConst.DEFAULT_QOS;
+				
+				// TODO: check the return value for each and take appropriate action
+				this.mqttClient.subscribeToTopic(ResourceNameEnum.GDA_MGMT_STATUS_MSG_RESOURCE, qos);
+				this.mqttClient.subscribeToTopic(ResourceNameEnum.CDA_ACTUATOR_RESPONSE_RESOURCE, qos);
+				this.mqttClient.subscribeToTopic(ResourceNameEnum.CDA_SENSOR_MSG_RESOURCE, qos);
+				this.mqttClient.subscribeToTopic(ResourceNameEnum.CDA_SYSTEM_PERF_MSG_RESOURCE, qos);
+			} else {
+				_Logger.severe("Failed to connect MQTT client to broker.");
+				
+				// TODO: take appropriate action
+			}
+		}
 	}
 	
 	/**
@@ -205,6 +222,18 @@ public class DeviceDataManager implements IDataMessageListener
 		if (this.sysPerfMgr != null) {
 			
 			this.sysPerfMgr.stopManager();
+		}
+		if (this.mqttClient != null) {
+			this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.GDA_MGMT_STATUS_MSG_RESOURCE);
+			this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.CDA_ACTUATOR_RESPONSE_RESOURCE);
+			this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.CDA_SENSOR_MSG_RESOURCE);
+			this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.CDA_SYSTEM_PERF_MSG_RESOURCE);
+			
+			if (this.mqttClient.disconnectClient()) {
+				_Logger.info("Successfully disconnected MQTT client from broker.");
+			} else {
+				_Logger.severe("Failed to disconnect MQTT client from broker.");
+			}
 		}
 	}
 
@@ -229,7 +258,8 @@ public class DeviceDataManager implements IDataMessageListener
 		}
 		
 		if (this.enableMqttClient) {
-			
+			this.mqttClient = new MqttClientConnector();
+			this.mqttClient.setDataMessageListener(this);
 		}
 		
 		if (this.enableCoapServer) {
