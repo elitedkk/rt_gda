@@ -72,9 +72,11 @@ public class CoapServerGatewayTest
 	
 	/**
 	 * 
-	 */
+	 * */
+	/*
+	 
 	@Test
-	public void testRunSimpleCoapServerGatewayIntegration()
+	public void testRunSimpleCoapServerGatewayIntegration_old()
 	{
 		try {
 			String url =
@@ -97,9 +99,7 @@ public class CoapServerGatewayTest
 			
 			// execute some simple get requests
 			
-			/*
-			 * NOTE: Change these to suit your own environment.
-			 */
+	
 			
 			clientConn.setURI(
 				url + "/" + ConfigConst.PRODUCT_NAME);
@@ -119,6 +119,34 @@ public class CoapServerGatewayTest
 			this.csg.stopServer();
 		} catch (Exception e) {
 			// ignore
+		}
+	}
+	*/
+	
+	@Test
+	public void testRunSimpleCoapServerGatewayIntegration()
+	{
+		try {
+			String url = "coap://localhost:5683";
+			
+			this.csg = new CoapServerGateway(); // assumes the no-arg constructor will create all resources internally
+			this.csg.startServer();
+			
+			CoapClient clientConn = new CoapClient(url);
+			
+			Set<WebLink> wlSet = clientConn.discover();
+				
+			if (wlSet != null) {
+				for (WebLink wl : wlSet) {
+					_Logger.info(" --> WebLink: " + wl.getURI() + ". Attributes: " + wl.getAttributes());
+				}
+			}
+			
+			Thread.sleep(DEFAULT_TIMEOUT); // DEFAULT_TIMEOUT is in milliseconds - for instance, 120000 (2 minutes)
+			
+			this.csg.stopServer();
+		} catch (Exception e) {
+			// log a message!
 		}
 	}
 	
