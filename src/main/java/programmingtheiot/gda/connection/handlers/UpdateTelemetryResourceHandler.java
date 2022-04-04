@@ -66,6 +66,41 @@ public class UpdateTelemetryResourceHandler extends CoapResource
 	@Override
 	public void handleDELETE(CoapExchange context)
 	{
+		ResponseCode code = ResponseCode.NOT_ACCEPTABLE;
+		  
+		  context.accept();
+		  
+		  if (this.dataMsgListener != null) {
+		    try {
+		      /*String jsonData = new String(context.getRequestPayload());
+		      
+		      SensorData sensordata =
+		        DataUtil.getInstance()
+		          .jsonToSensorData(jsonData);
+		      
+		      
+		      this.dataMsgListener.handleSensorMessage(this.resource, sensordata);
+		      */
+		    //Nothing is deleted but sending the response for wireshark
+		      code = ResponseCode.DELETED;
+		    } catch (Exception e) {
+		      _Logger.warning(
+		        "Failed to handle DELETE request. Message: " +
+		        e.getMessage());
+		      
+		      code = ResponseCode.BAD_REQUEST;
+		    }
+		  } else {
+		    _Logger.info(
+		      "No callback listener for request. Ignoring DELETE.");
+		    
+		    code = ResponseCode.CONTINUE;
+		  }
+		  
+		  String msg =
+		    "Deleted: " + super.getName();
+		  
+		  context.respond(code, msg);
 	}
 	
 	@Override
@@ -76,6 +111,40 @@ public class UpdateTelemetryResourceHandler extends CoapResource
 	@Override
 	public void handlePOST(CoapExchange context)
 	{
+		ResponseCode code = ResponseCode.NOT_ACCEPTABLE;
+		  
+		  context.accept();
+		  
+		  if (this.dataMsgListener != null) {
+		    try {
+		      String jsonData = new String(context.getRequestPayload());
+		      
+		      SensorData sensordata =
+		        DataUtil.getInstance()
+		          .jsonToSensorData(jsonData);
+		      
+		      
+		      this.dataMsgListener.handleSensorMessage(this.resource, sensordata);
+		      
+		      code = ResponseCode.CREATED;
+		    } catch (Exception e) {
+		      _Logger.warning(
+		        "Failed to handle POST request. Message: " +
+		        e.getMessage());
+		      
+		      code = ResponseCode.BAD_REQUEST;
+		    }
+		  } else {
+		    _Logger.info(
+		      "No callback listener for request. Ignoring POST.");
+		    
+		    code = ResponseCode.CONTINUE;
+		  }
+		  
+		  String msg =
+		    "POST request handled: " + super.getName();
+		  
+		  context.respond(code, msg);
 	}
 	
 	@Override
@@ -112,7 +181,7 @@ public class UpdateTelemetryResourceHandler extends CoapResource
 		  }
 		  
 		  String msg =
-		    "Update system perf data request handled: " + super.getName();
+		    "PUT data request handled: " + super.getName();
 		  
 		  context.respond(code, msg);
 	}
