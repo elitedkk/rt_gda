@@ -61,6 +61,7 @@ public class DeviceDataManager implements IDataMessageListener
 	private IRequestResponseClient smtpClient = null;
 	private CoapServerGateway coapServer = null;
 	private SystemPerformanceManager sysPerfMgr = null;
+	private ActuatorData actData = null;
 	// constructors
 	
 	public DeviceDataManager()
@@ -84,6 +85,8 @@ public class DeviceDataManager implements IDataMessageListener
 			configUtil.getBoolean(
 				ConfigConst.GATEWAY_DEVICE, ConfigConst.ENABLE_PERSISTENCE_CLIENT_KEY);
 		initConnections();
+		actData = new ActuatorData();
+		actData.setCommand(ConfigConst.OFF_COMMAND);
 	}
 	
 	public DeviceDataManager(
@@ -138,7 +141,28 @@ public class DeviceDataManager implements IDataMessageListener
 			if (data.hasError()) {
 				_Logger.warning("Error flag set for SensorData instance.");
 			}
-			
+			if (data.getTypeID() == ConfigConst.HUMIDITY_SENSOR_TYPE) {
+				if(data.getValue()> ConfigConst.HUMIDITY_CEILING) {
+					actData.setCommand(ConfigConst.ON_COMMAND);
+					if (this.enableMqttClient) {
+						int qos=ConfigConst.DEFAULT_QOS;
+						DataUtil du = DataUtil.getInstance();
+						String jSon = du.actuatorDataToJson(actData);
+						_Logger.info("Turning ON the Humidifier");
+						this.handleUpstreamTransmission(ResourceNameEnum.CDA_ACTUATOR_CMD_RESOURCE,jSon,qos);
+					}
+				}
+				else if (data.getValue() < ConfigConst.HUMIDITY_FLOOR) {
+					actData.setCommand(ConfigConst.OFF_COMMAND);
+					if (this.enableMqttClient) {
+						int qos=ConfigConst.DEFAULT_QOS;
+						DataUtil du = DataUtil.getInstance();
+						String jSon = du.actuatorDataToJson(actData);
+						_Logger.info("Turning OFF the Humidifier");
+						this.handleUpstreamTransmission(ResourceNameEnum.CDA_ACTUATOR_CMD_RESOURCE,jSon,qos);
+					}
+				}
+			}
 			return true;
 		} else {
 			return false;
@@ -183,6 +207,9 @@ public class DeviceDataManager implements IDataMessageListener
 	private boolean handleUpstreamTransmission(ResourceNameEnum resourceName, String jsonData, int qos)
 	{
 		_Logger.fine("Analyzing upstream Data");
+		if(this.enableMqttClient) {
+			this.mqttClient.publishMessage(ResourceNameEnum.CDA_ACTUATOR_CMD_RESOURCE, jsonData, qos);
+		}
 		return true;
 	}
 	

@@ -247,6 +247,9 @@ public class ConfigConst
 	public static final String TEST_EMPTY_APP_KEY = "testEmptyApp";
 	
 	
+	public static final float HUMIDITY_FLOOR   =   (float) 35.0;
+	public static final float HUMIDITY_CEILING  =   (float) 45.0;
+	
 	// constructors
 	
 	/**

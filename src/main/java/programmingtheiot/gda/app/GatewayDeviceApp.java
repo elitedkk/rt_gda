@@ -67,7 +67,7 @@ public class GatewayDeviceApp
 		
 		try {
 			//Thread.sleep(DEFAULT_TEST_RUNTIME);
-			Thread.sleep(65000L);
+			Thread.sleep(300000L);
 		} catch (InterruptedException e) {
 			// ignore
 		}

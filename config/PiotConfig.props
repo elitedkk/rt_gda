@@ -12,14 +12,14 @@
 #
 [Cloud.GatewayService]
 credFile       = ./cred/PiotCloudCred.props
-certFile       = ./cert/PiotCloudCert.pem
-host           = localhost
+certFile       = ./cert/server.crt
+host           = k1Ra
 port           = 1883
 securePort     = 8883
 defaultQoS     = 0
 keepAlive      = 60
 enableAuth     = True
-enableCrypt    = True
+enableCrypt    = False
 baseUrl        = 
 baseTopic      = 
 
@@ -39,8 +39,8 @@ enableCrypt    = True
 #
 [Mqtt.GatewayService]
 credFile       = ./cred/PiotMqttCred.props
-certFile       = ./cert/PiotMqttLocalCertFile.pem
-host           = localhost
+certFile       = ./cert/client.crt
+host           = k1Ra
 port           = 1883
 securePort     = 8883
 defaultQoS     = 0
