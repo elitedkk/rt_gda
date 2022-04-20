@@ -118,7 +118,7 @@ public class CoapClientPerformanceTest
 	/**
 	 * 
 	 */
-	@Test
+	//@Test
 	public void testPutRequestCon()
 	{
 		_Logger.info("Testing PUT - CON");
@@ -129,7 +129,7 @@ public class CoapClientPerformanceTest
 	/**
 	 * 
 	 */
-	@Test
+	//@Test
 	public void testPutRequestNon()
 	{
 		_Logger.info("Testing PUT - NON");

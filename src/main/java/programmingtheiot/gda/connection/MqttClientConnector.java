@@ -122,6 +122,7 @@ public class MqttClientConnector implements IPubSubClient, MqttCallbackExtended
 	@Override
 	public boolean connectClient()
 	{
+		_Logger.info("*********** EnableEncryption **************" + Boolean.toString(this.enableEncryption));
 		try {
 			if (this.mqttClient == null) {
 				this.mqttClient = new MqttClient(this.brokerAddr, this.clientID, this.persistence);
@@ -202,7 +203,7 @@ public class MqttClientConnector implements IPubSubClient, MqttCallbackExtended
 			this.mqttClient.publish(topicName.getResourceName(), mqttMsg);
 			return true;
 		} catch (Exception e) {
-			//_Logger.log(Level.SEVERE, "Failed to publish message to topic: " + topicName, e);
+			_Logger.log(Level.SEVERE, "Failed to publish message to topic: " + topicName, e);
 		}
 		
 		return false;
