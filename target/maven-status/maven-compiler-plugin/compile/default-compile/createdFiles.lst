@@ -4,6 +4,7 @@ programmingtheiot/data/SystemStateData.class
 programmingtheiot/gda/connection/IRequestResponseClient.class
 programmingtheiot/gda/connection/ICloudClient.class
 programmingtheiot/data/ActuatorData.class
+programmingtheiot/gda/connection/IConnectionListener.class
 programmingtheiot/gda/system/BaseSystemUtilTask.class
 programmingtheiot/common/ResourceNameEnum.class
 programmingtheiot/data/BaseIotData.class
@@ -35,5 +36,6 @@ programmingtheiot/gda/connection/MqttClientConnector$SystemPerformanceMessageLis
 programmingtheiot/gda/connection/IPersistenceClient.class
 programmingtheiot/gda/connection/IPubSubClient.class
 programmingtheiot/data/SystemPerformanceData.class
+programmingtheiot/gda/connection/CloudClientConnector$LedEnablementMessageListener.class
 programmingtheiot/gda/connection/RedisPersistenceAdapter.class
 programmingtheiot/gda/app/GatewayDeviceApp.class
