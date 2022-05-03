@@ -26,8 +26,8 @@ baseTopic      = /v1.6/devices/
 # SMTP client configuration information
 #
 [Smtp.GatewayService]
-credFile       = ./cred/PiotSmtpCred.props
-host           = localhost
+credFile       = /home/ishan/workbox/e_auth.props
+host           = k1Ra
 port           = 25
 securePort     = 587
 enableAuth     = True
@@ -71,8 +71,8 @@ enableMqttClient        = True
 enableCoapServer        = False
 enableCoapClient        = True
 enableCloudClient       = True
-enableSmtpClient        = False
-enablePersistenceClient = False
+enableSmtpClient        = True
+enablePersistenceClient = True
 enableSystemPerformance = False
 testGdaDataPath         = /tmp/gda-data
 testCdaDataPath         = /tmp/cda-data
