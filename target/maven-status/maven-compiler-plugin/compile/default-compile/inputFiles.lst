@@ -27,6 +27,7 @@
 /home/ishan/workbox/connecteddevices/gda-lab-modules-elitedkk/src/main/java/programmingtheiot/data/DataUtil.java
 /home/ishan/workbox/connecteddevices/gda-lab-modules-elitedkk/src/main/java/programmingtheiot/gda/connection/handlers/UpdateTelemetryResourceHandler.java
 /home/ishan/workbox/connecteddevices/gda-lab-modules-elitedkk/src/main/java/programmingtheiot/common/DefaultDataMessageListener.java
+/home/ishan/workbox/connecteddevices/gda-lab-modules-elitedkk/src/main/java/programmingtheiot/gda/connection/ISimpleMessagingClient.java
 /home/ishan/workbox/connecteddevices/gda-lab-modules-elitedkk/src/main/java/programmingtheiot/gda/connection/SmtpClientConnector.java
 /home/ishan/workbox/connecteddevices/gda-lab-modules-elitedkk/src/main/java/programmingtheiot/gda/connection/IConnectionListener.java
 /home/ishan/workbox/connecteddevices/gda-lab-modules-elitedkk/src/main/java/programmingtheiot/gda/system/SystemMemUtilTask.java

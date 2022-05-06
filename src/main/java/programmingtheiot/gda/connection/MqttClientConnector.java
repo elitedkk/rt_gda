@@ -255,7 +255,7 @@ public class MqttClientConnector implements IPubSubClient, MqttCallbackExtended
 			
 			return false;
 		}
-		_Logger.info("111Attempting to subscribe to topicName " + topicName);
+		_Logger.info("Attempting to subscribe to topicName " + topicName);
 		IMqttMessageListener listener=null;
 		if (topicName==ResourceNameEnum.CDA_ACTUATOR_RESPONSE_RESOURCE) {
 			listener = new ActuatorResponseMessageListener(ResourceNameEnum.CDA_ACTUATOR_RESPONSE_RESOURCE, this.dataMsgListener); 

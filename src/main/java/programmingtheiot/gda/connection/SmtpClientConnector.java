@@ -72,6 +72,7 @@ public class SmtpClientConnector implements ISimpleMessagingClient
 	public SmtpClientConnector()
 	{
 		super();
+		_Logger.info("Init Smtp...");
 	}
 	
 	

@@ -23,6 +23,7 @@ programmingtheiot/gda/connection/MqttClientConnector$SensorResponseMessageListen
 programmingtheiot/gda/connection/MqttClientConnector$ActuatorResponseMessageListener.class
 programmingtheiot/gda/system/SystemPerformanceManager.class
 programmingtheiot/gda/connection/SmtpClientConnector.class
+programmingtheiot/gda/connection/ISimpleMessagingClient.class
 programmingtheiot/gda/connection/handlers/GenericCoapResponseHandler.class
 programmingtheiot/gda/connection/IPersistenceListener.class
 programmingtheiot/gda/system/SystemCpuUtilTask.class

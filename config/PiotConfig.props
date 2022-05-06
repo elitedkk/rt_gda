@@ -26,8 +26,8 @@ baseTopic      = /v1.6/devices/
 # SMTP client configuration information
 #
 [Smtp.GatewayService]
-credFile       = /home/ishan/workbox/e_auth.props
-host           = k1Ra
+credFile       = /home/ishan/workbox/keys/smtpcred.props
+host           = smtp.gmail.com
 port           = 25
 securePort     = 587
 enableAuth     = True
@@ -45,7 +45,7 @@ securePort     = 8883
 defaultQoS     = 0
 keepAlive      = 60
 enableAuth     = False
-enableCrypt    = True
+enableCrypt    = False
 
 #
 # CoAP client and server configuration information
@@ -61,6 +61,15 @@ enableCrypt    = False
 enableConfirmedMsgs = True
 
 #
+# Persistence client configuration information
+#
+[Data.GatewayService]
+credFile = ./cred/PiotPersistenceCred.props
+host = localhost
+port = 6379
+enableCrypt = False
+
+#
 # GDA specific configuration information
 #
 [GatewayDevice]
@@ -71,7 +80,7 @@ enableMqttClient        = True
 enableCoapServer        = False
 enableCoapClient        = True
 enableCloudClient       = True
-enableSmtpClient        = True
+enableSmtpClient        = False
 enablePersistenceClient = True
 enableSystemPerformance = False
 testGdaDataPath         = /tmp/gda-data

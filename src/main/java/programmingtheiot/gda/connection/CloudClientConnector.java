@@ -244,7 +244,7 @@ public class CloudClientConnector implements ICloudClient, IConnectionListener
 		ad.setName(ConfigConst.LED_ACTUATOR_NAME);
 		ad.setValue((float) -1.0); // NOTE: this just needs to be an invalid actuation value
 		_Logger.info("Cloud connection complete");
-		String ledTopic = createTopicName(ledListener.getResource().getDeviceName(), ad.getName());
+		//String ledTopic = createTopicName(ledListener.getResource().getDeviceName(), ad.getName());
 		String adJson = DataUtil.getInstance().actuatorDataToJson(ad);
 		//_Logger.info("ALAKAZAM ALAKAZAM ALAKAZAM Subscribing to " + ledListener.getResource()+ad.getName());
 		//_Logger.info("ALAKAZAM ALAKAZAM ALAKAZAM Publishing to " + ledListener.getResource());
@@ -271,10 +271,13 @@ public class CloudClientConnector implements ICloudClient, IConnectionListener
 		
 		private int    typeID   = ConfigConst.LED_ACTUATOR_TYPE;
 		private String itemName = ConfigConst.LED_ACTUATOR_NAME;
+		//private MqttClientConnector mqttCda;
 		
 		LedEnablementMessageListener(IDataMessageListener dataMsgListener)
 		{
 			this.dataMsgListener = dataMsgListener;
+			//this.mqttCda = new MqttClientConnector();
+			//this.mqttCda.connectClient();
 		}
 		
 		public ResourceNameEnum getResource()
@@ -303,11 +306,14 @@ public class CloudClientConnector implements ICloudClient, IConnectionListener
 					case ConfigConst.ON_COMMAND:
 						_Logger.info("Received LED enablement message [ON].");
 						actuatorData.setStateData("LED switching ON");
+						//this.mqttCda.publishMessage(resource, jsonData, ConfigConst.DEFAULT_QOS);
+						
 						break;
 						
 					case ConfigConst.OFF_COMMAND:
 						_Logger.info("Received LED enablement message [OFF].");
 						actuatorData.setStateData("LED switching OFF");
+						//this.mqttCda.publishMessage(resource, jsonData, ConfigConst.DEFAULT_QOS);
 						break;
 						
 					default:
@@ -318,8 +324,11 @@ public class CloudClientConnector implements ICloudClient, IConnectionListener
 				if (this.dataMsgListener != null) {
 					jsonData = DataUtil.getInstance().actuatorDataToJson(actuatorData);
 					
-					this.dataMsgListener.handleIncomingMessage(
+					boolean result = this.dataMsgListener.handleIncomingMessage(
 						ResourceNameEnum.CDA_ACTUATOR_CMD_RESOURCE, jsonData);
+					if(result) {
+						_Logger.info("Published data to MQTT topic: " + this.resource.getResourceName());
+					}
 				}
 			} catch (Exception e) {
 				_Logger.warning("Failed to convert message payload to ActuatorData.");

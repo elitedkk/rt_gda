@@ -23,6 +23,7 @@ import programmingtheiot.data.DataUtil;
 import programmingtheiot.data.SensorData;
 import programmingtheiot.data.SystemPerformanceData;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 /**
@@ -37,8 +38,10 @@ public class RedisPersistenceAdapter implements IPersistenceClient
 		Logger.getLogger(RedisPersistenceAdapter.class.getName());
 	
 	// private var's
-	
-	
+	//JedisPooled jedis = new JedisPooled("localhost", 6379);
+	String host;
+	int port;
+	JedisPool jpool;
 	// constructors
 	
 	/**
@@ -47,9 +50,18 @@ public class RedisPersistenceAdapter implements IPersistenceClient
 	 */
 	public RedisPersistenceAdapter()
 	{
+		
 		super();
 		
 		initClient();
+		ConfigUtil configUtil = ConfigUtil.getInstance();
+		this.host =
+				configUtil.getProperty(
+					ConfigConst.DATA_GATEWAY_SERVICE, ConfigConst.HOST_KEY);
+		this.port =
+				configUtil.getInteger(
+					ConfigConst.DATA_GATEWAY_SERVICE, ConfigConst.PORT_KEY);
+
 	}
 	
 	
@@ -58,7 +70,22 @@ public class RedisPersistenceAdapter implements IPersistenceClient
 	@Override
 	public boolean connectClient()
 	{
-		return false;
+		try {
+			if(jpool==null) {
+				_Logger.warning("Init redis connection");
+				jpool = new JedisPool(this.host,this.port);
+				
+			}
+			else {
+				_Logger.warning("Redis connection already exists");
+			}
+			return true;
+		}
+		catch(Exception ex) {
+			_Logger.severe("Error in connecting redis client");
+			return false;
+		}
+		
 	}
 
 	@Override
@@ -87,13 +114,35 @@ public class RedisPersistenceAdapter implements IPersistenceClient
 	@Override
 	public boolean storeData(String topic, int qos, ActuatorData... data)
 	{
-		return false;
+		for(int i=0; i<data.length; i++) {
+			String json = DataUtil.getInstance().actuatorDataToJson(data[i]);
+			try(Jedis jedis = this.jpool.getResource()) {
+				jedis.set(topic, json);
+			}
+			catch(Exception ex){
+				_Logger.warning("Error putting into redis");
+				return false;
+			}
+		}
+		_Logger.info("Successfully put values into redis topic: " + topic);
+		return true;
 	}
 
 	@Override
 	public boolean storeData(String topic, int qos, SensorData... data)
 	{
-		return false;
+		for(int i=0; i<data.length; i++) {
+			String json = DataUtil.getInstance().sensorDataToJson(data[i]);
+			try(Jedis jedis = this.jpool.getResource()) {
+				jedis.set(topic, json);
+			}
+			catch(Exception ex){
+				_Logger.warning("Error putting into redis");
+				return false;
+			}
+		}
+		_Logger.info("Successfully put values into redis topic: " + topic);
+		return true;
 	}
 
 	/**
@@ -102,7 +151,18 @@ public class RedisPersistenceAdapter implements IPersistenceClient
 	@Override
 	public boolean storeData(String topic, int qos, SystemPerformanceData... data)
 	{
-		return false;
+		for(int i=0; i<data.length; i++) {
+			String json = DataUtil.getInstance().systemPerformanceDataToJson(data[i]);
+			try(Jedis jedis = this.jpool.getResource()) {
+				jedis.set(topic, json);
+			}
+			catch(Exception ex){
+				_Logger.warning("Error putting into redis");
+				return false;
+			}
+		}
+		_Logger.info("Successfully put values into redis topic: " + topic);
+		return true;
 	}
 	
 	

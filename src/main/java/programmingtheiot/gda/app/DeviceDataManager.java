@@ -30,6 +30,7 @@ import programmingtheiot.gda.connection.ICloudClient;
 import programmingtheiot.gda.connection.IPersistenceClient;
 import programmingtheiot.gda.connection.IPubSubClient;
 import programmingtheiot.gda.connection.IRequestResponseClient;
+import programmingtheiot.gda.connection.ISimpleMessagingClient;
 import programmingtheiot.gda.connection.MqttClientConnector;
 import programmingtheiot.gda.connection.RedisPersistenceAdapter;
 import programmingtheiot.gda.connection.SmtpClientConnector;
@@ -59,7 +60,7 @@ public class DeviceDataManager implements IDataMessageListener
 	private IPubSubClient mqttClient = null;
 	private ICloudClient cloudClient = null;
 	private IPersistenceClient persistenceClient = null;
-	private IRequestResponseClient smtpClient = null;
+	private ISimpleMessagingClient smtpClient = null;
 	private CoapServerGateway coapServer = null;
 	private SystemPerformanceManager sysPerfMgr = null;
 	private ActuatorData actData = null;
@@ -85,6 +86,10 @@ public class DeviceDataManager implements IDataMessageListener
 		this.enablePersistenceClient =
 			configUtil.getBoolean(
 				ConfigConst.GATEWAY_DEVICE, ConfigConst.ENABLE_PERSISTENCE_CLIENT_KEY);
+		this.enableSmtpClient=
+				configUtil.getBoolean(
+						ConfigConst.GATEWAY_DEVICE, ConfigConst.ENABLE_SMTP_CLIENT_KEY);
+		
 		initConnections();
 		actData = new ActuatorData();
 		actData.setCommand(ConfigConst.OFF_COMMAND);
@@ -114,7 +119,9 @@ public class DeviceDataManager implements IDataMessageListener
 			if (data.hasError()) {
 				_Logger.warning("Error flag set for ActuatorData instance.");
 			}
-			
+			if (this.persistenceClient!=null) {
+				this.persistenceClient.storeData(resourceName.getResourceName(), 0, data);
+			}
 			return true;
 		} else {
 			return false;
@@ -138,13 +145,16 @@ public class DeviceDataManager implements IDataMessageListener
 					
 					if (this.mqttClient != null) {
 						// TODO: retrieve the QoS level from the configuration file
-						_Logger.fine("Publishing data to MQTT broker: " + jsonData);
-						return this.mqttClient.publishMessage(resourceName, jsonData, 0);
+						//_Logger.info("Publishing data to MQTT broker: " + jsonData);
+						_Logger.info("Publishing data to MQTT broker: " + resourceName.getResourceName());
+						return this.mqttClient.publishMessage(resourceName, jsonData, 1);
+						
 					}
 					
 					// TODO: If the GDA is hosting a CoAP server (or a CoAP client that
 					// will connect to the CDA's CoAP server), you can add that logic here
 					// in place of the MQTT client or in addition
+					
 					
 				} else {
 					_Logger.warning("Failed to parse incoming message. Unknown type: " + msg);
@@ -192,13 +202,24 @@ public class DeviceDataManager implements IDataMessageListener
 					}
 				}
 			}*/
-
+			if (this.persistenceClient!=null) {
+				this.persistenceClient.storeData(resourceName.getResourceName(), 0, data);
+			}
+			
+			
 			if (this.cloudClient != null) {
 				// TODO: handle any failures
 				
 				if (this.cloudClient.sendEdgeDataToCloud(resourceName, data)) {
 					_Logger.info("Sent SensorData upstream to CSP.");
 				}
+			}
+			
+			if (this.smtpClient != null && this.cloudClient==null) {
+				DataUtil du = DataUtil.getInstance();
+				String jSon = du.actuatorDataToJson(actData);
+				_Logger.info("Sending an email...");
+				this.smtpClient.sendMessage(resourceName, jSon, 30);
 			}
 			return true;
 		} else {
@@ -221,6 +242,14 @@ public class DeviceDataManager implements IDataMessageListener
 				if (this.cloudClient.sendEdgeDataToCloud(resourceName, data)) {
 					_Logger.info("Sent SystemPerformanceData upstream to CSP.");
 				}
+			}
+			if (this.smtpClient != null && this.cloudClient==null) {
+				DataUtil du = DataUtil.getInstance();
+				String jSon = du.systemPerformanceDataToJson(data);
+				this.smtpClient.sendMessage(resourceName, jSon, 30);
+			}
+			if (this.persistenceClient!=null) {
+				this.persistenceClient.storeData(resourceName.getResourceName(), 0, data);
 			}
 			return true;
 		} else {
@@ -297,6 +326,14 @@ public class DeviceDataManager implements IDataMessageListener
 				_Logger.info("CoAP server started.");
 			} else {
 				_Logger.severe("Failed to start CoAP server. Check log file for details.");
+			}
+		}
+		if (this.enablePersistenceClient) {
+			if(this.persistenceClient.connectClient()) {
+				_Logger.info("Started the Redis storage");
+			}
+			else {
+				_Logger.warning("Could not start redis connection");
 			}
 		}
 		if (this.enableCloudClient && this.cloudClient != null) {
@@ -386,8 +423,12 @@ public class DeviceDataManager implements IDataMessageListener
 			this.cloudClient.setDataMessageListener(this);
 		}
 		
+		if (this.enableSmtpClient) {
+			this.smtpClient = new SmtpClientConnector();
+		}
+		
 		if (this.enablePersistenceClient) {
-			//not used
+			this.persistenceClient = new RedisPersistenceAdapter();
 		}
 	}
 	
